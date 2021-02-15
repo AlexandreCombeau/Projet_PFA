@@ -8,7 +8,10 @@ Personnage : simple, bouge à droite, gauche, peut sauter et faire une action de
 
 enemies simples : pas beaucoup, juste un peu histoire de faire chier le joueur, comportement reduit au minimum, simplement avancer vers le joueur
 
-syteme d'upgrade pour debloquer de nouvelles zones, genre double saut, casser porte ...etc
+zones: Elle feront dans un premiers temps la taille de la fenêtre, mais cela pourrait changer si on décide de créer une ou plusieurs zones plus grandes que les autres.
+La caméra sera centrées sur le centre de la zone et inamovible dans les petites zones mais centrées sur le personnage dans les zones de plus grandes envergures. 
+
+syteme d'upgrade pour debloquer de nouvelles zones, genre double saut, casser porte, pousser des gros éléments de décors amovibles, sauter sur les murs ...etc
 
 
 
