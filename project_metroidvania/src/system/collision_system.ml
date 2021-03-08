@@ -80,8 +80,8 @@ let update _dt el =
             if CollisionResolver.has_component e1 then (CollisionResolver.get e1) e1 e2;
             if CollisionResolver.has_component e2 then (CollisionResolver.get e2) e2 e1;
             
-            if Name.get e1 = "player" then Jumping.set e1 true;
-            if Name.get e2 = "player" then Jumping.set e2 true;
+            if Name.get e1 = "player" then Jumping.set e1 0;
+            if Name.get e2 = "player" then Jumping.set e2 0;
           end
       end
       ) el) el

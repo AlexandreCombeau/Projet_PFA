@@ -6,4 +6,4 @@ module Surface = Component.Make (struct include Texture let name = "texture" end
 module Name = Component.Make(struct type t = string let name = "name" end)
 module CollisionResolver = Component.Make(struct type t = Entity.t -> Entity.t -> unit let name = "resolver" end)
 module Owner = Component.Make(struct type t = Entity.t let name = "owner" end)
-module Jumping = Component.Make(struct type t = bool let name = "jumping" end)
+module Jumping = Component.Make(struct type t = int let name = "jumping" end)

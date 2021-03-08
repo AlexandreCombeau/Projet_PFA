@@ -16,7 +16,7 @@ let create name x y =
   Box.set e {width = 20; height= 20 };
   Name.set e name;
   Surface.set e Texture.green;
-  Jumping.set e false;
+  Jumping.set e 100;
 
 
   (* systems *)
@@ -38,9 +38,10 @@ let move_left e =
     Velocity.set e { x = -100.0; y = (Velocity.get e).y }
     
 let jump e =
-    if Game_state.get_turn () == Playing && Jumping.get e = true then
-    Velocity.set e { x = (Velocity.get e).x; y = -300.0 }; Jumping.set e false
-
+    if Game_state.get_turn () == Playing && Jumping.get e < 1 then
+    (Velocity.set e { x = (Velocity.get e).x; y = -150.0 }; Jumping.set e ((Jumping.get e)+1))
+    else Velocity.set e { x = (Velocity.get e).x; y = 100.0 }
+    
 let stopmoving e =
   Velocity.set e { x = 0.0; y = 100.0 }
 

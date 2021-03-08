@@ -6,7 +6,7 @@ let wall_left = Wall.create "wall_left" 0.0 20.0 (Globals.wall_thickness) ((Glob
 let wall_rght = Wall.create "wall_right" 780.0 20.0 (Globals.wall_thickness) ((Globals.canvas_height-40))
 let wall_top = Wall.create "wall_top" 0.0 0.0 (Globals.canvas_width) (Globals.wall_thickness)
 let platform = Wall.create "platform" 375.0 525.0 50 10
-let objet = Object.create "objet" 375.0 400.0 50 50
+let objet = Object.create "objet" 375.0 400.0
 
 let () =
   Input_handler.register_command (KeyDown "ArrowRight") (fun () -> Player.move_right player);

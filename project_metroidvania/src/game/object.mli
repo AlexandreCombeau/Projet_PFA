@@ -1,1 +1,3 @@
-val create : string -> float -> float -> int -> int -> Entity.t
+val create : string -> float -> float -> Entity.t
+
+val reset : Entity.t -> float -> float -> unit
