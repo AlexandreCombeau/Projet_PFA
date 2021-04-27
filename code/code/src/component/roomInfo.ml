@@ -1,0 +1,1 @@
+type t = { roomID : string ; x : float ; y : float }

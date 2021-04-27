@@ -1,8 +1,0 @@
-(alias
-   (name default)
-   (deps prog/game_js.bc.js (glob_files resources/files/*))
-)
-(alias
-   (name default)
-   (deps (source_tree resources/files)
-))

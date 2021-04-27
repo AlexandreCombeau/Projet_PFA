@@ -1,0 +1,17 @@
+(executable
+ (name game_js)
+ (modes js)
+ (modules game_js)
+ (preprocess (pps js_of_ocaml-ppx))
+ (libraries game js_of_ocaml gfx_jsoo)
+ (js_of_ocaml (flags -I . --file=../resources))
+)
+
+
+
+(executable
+ (name game_sdl)
+ (modes native)
+ (modules game_sdl)
+ (libraries game gfx_sdl tsdl tsdl_image tsdl_ttf)
+)
