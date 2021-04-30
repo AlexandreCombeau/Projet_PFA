@@ -26,16 +26,22 @@ let update _dt el =
           not (Vector.is_zero v1 && Vector.is_zero v2)
           then begin
             if Background.has_component e1 then begin
-              if Before.has_component e2 && ((Before.get (Game_state.get_player ())) == false) then begin 
+              if Before.has_component e1 && Resting.has_component e2 then begin 
+                Leaving.set (Game_state.get_level ()) true;
+              end;
+              if Resting.has_component e2 && ((Before.get (Game_state.get_player ())) == false) then begin 
               Destination.set (Game_state.get_level ()) (Destination.get e1);
               Before.set e2 true
               end
             end else begin
-            if Background.has_component e2 then begin
-              if Before.has_component e1 && ((Before.get (Game_state.get_player ())) == false)  then begin 
-                Destination.set (Game_state.get_level ()) (Destination.get e2);
-                Before.set e1 true
-              end
+              if Background.has_component e2 then begin
+                if Before.has_component e2 && Resting.has_component e1 then begin 
+                  Leaving.set (Game_state.get_level ()) true;
+                end;
+                if Before.has_component e1 && ((Before.get (Game_state.get_player ())) == false)  then begin 
+                  Destination.set (Game_state.get_level ()) (Destination.get e2);
+                  Before.set e1 true
+                end
             end else begin
                         (* [3] le plus petit des vecteurs a b c d *)
                         let a = Vector.{ x = s_pos.x; y = 0.0} in

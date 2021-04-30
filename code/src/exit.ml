@@ -7,9 +7,11 @@ let create name x y w h room dx dy =
   (* components *)
   Position.set e { x = x; y = y};
   Velocity.set e Vector.zero;
-  Mass.set e infinity;
   Box.set e {width = w; height=h };
   Name.set e name;
+  Background.set e "exit";
+  Before.set e true;
+  Surface.set e (Color (Gfx.color 0 128 128 100));
   Destination.set e { name = room ; x = dx ; y = dy };
   (* Systems *)
   Collision_S.register e;

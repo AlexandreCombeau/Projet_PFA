@@ -9,12 +9,12 @@ let chain_functions f_list =
                   funs := ll;
                   true
                  end
-
+ 
 let init_game _dt =
   let level = Level.create "level2" in
-  Level.load_walls "level2";
+  Level.load_level "level2";
   let player = Player.create "player" 100.0 5850.0 in
-  Level.load_doors "level2";
+  Level.load_background "level2";
   Game_state.init player level;
   Input_handler.register_command (KeyDown "w") (Player.jump);
   Input_handler.register_command (KeyUp "w") (Player.stop_jump);

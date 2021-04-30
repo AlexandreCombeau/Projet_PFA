@@ -31,6 +31,28 @@ let load_walls name =
       with End_of_file -> () in 
       ()
     
+let load_exits name = 
+    let ic = open_in ("/static/resources/"^name^"/exits.txt") in
+    let () =
+      try
+        let count = ref 0 in
+        while true do
+            let line = input_line ic in
+            match String.split_on_char ',' line with
+            |[ sx; sy; sw; sh; sr; sdx; sdy ] -> ignore (Exit.create ("exit_" ^ string_of_int !count)
+                                                            (float_of_string sx)
+                                                            (float_of_string sy)
+                                                            (int_of_string sw)
+                                                            (int_of_string sh)
+                                                            sr
+                                                            (float_of_string sdx)
+                                                            (float_of_string sdy));
+                                                            count := !count + 1;
+            | _ -> ()
+        done;
+      with End_of_file -> () in 
+      ()    
+
 let load_doors name = 
     let ic = open_in ("/static/resources/"^name^"/doors.txt") in
     let () =
@@ -39,7 +61,7 @@ let load_doors name =
           while true do
             let line = input_line ic in
             match String.split_on_char ',' line with
-              [ sx; sy; sw; sh; sr; sdx; sdy ] -> ignore (Door.create ("door_" ^ string_of_int !count)
+              |[ sx; sy; sw; sh; sr; sdx; sdy ] -> ignore (Door.create ("door_" ^ string_of_int !count)
                                                             (float_of_string sx)
                                                             (float_of_string sy)
                                                             (int_of_string sw)
@@ -52,7 +74,16 @@ let load_doors name =
             done 
           with End_of_file -> () in
           ()
-  
+
+let load_level name = 
+  load_walls name;
+  ()
+
+let load_background name =
+  load_exits name;
+  load_doors name;
+  ()
+
 let clear () = 
   let elem_list = Name.members () in
   List.iter (fun e -> 
@@ -86,9 +117,9 @@ let change_level ()=
     let d = Destination.get (Game_state.get_level ()) in
     clear ();
     let level = create d.name in
-    load_walls d.name;
+    load_level d.name;
     let player = Player.create "player" d.x d.y in
-    load_doors d.name;
+    load_background d.name;
     Game_state.init player level;
     true
   end else false
