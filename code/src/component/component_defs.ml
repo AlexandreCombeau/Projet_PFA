@@ -15,8 +15,15 @@ module Croushed = Component.Make(struct type t = bool let name = "isCroushed" en
 module Leaving = Component.Make(struct type t = bool let name = "leaving" end)
 module Before = Component.Make(struct type t = bool let name = "inFrontOf" end)
 
-module Background = Component.Make(struct type t = string let name = "imageID" end)
+module Background = Component.Make(struct type t = bool let name = "existOrNot" end)
 
 module SumForces = Component.Make (struct type t = Vector.t let name = "forces" end)
 
 module Destination = Component.Make (struct include RoomInfo let name = "destination" end)
+
+module HitPoints = Component.Make (struct type t = int let name = "healthBar" end)
+module Stuff = Component.Make (struct type t = string list let name = "belongings" end)
+module Glider = Component.Make (struct type t = bool let name = "haveGlider" end)
+module Shrinker = Component.Make (struct type t = bool let name = "haveShrinker" end)
+module Reactor = Component.Make (struct type t = bool let name = "haveReactor" end)
+module Climber = Component.Make (struct type t = bool let name = "haveClimber" end)

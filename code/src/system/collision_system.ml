@@ -26,22 +26,46 @@ let update _dt el =
           not (Vector.is_zero v1 && Vector.is_zero v2)
           then begin
             if Background.has_component e1 then begin
-              if Before.has_component e1 && Resting.has_component e2 then begin 
-                Leaving.set (Game_state.get_level ()) true;
-              end;
-              if Resting.has_component e2 && ((Before.get (Game_state.get_player ())) == false) then begin 
-              Destination.set (Game_state.get_level ()) (Destination.get e1);
-              Before.set e2 true
-              end
-            end else begin
-              if Background.has_component e2 then begin
-                if Before.has_component e2 && Resting.has_component e1 then begin 
+              if Destination.has_component e1 then begin
+                if Before.has_component e1 && Resting.has_component e2 then begin 
                   Leaving.set (Game_state.get_level ()) true;
                 end;
-                if Before.has_component e1 && ((Before.get (Game_state.get_player ())) == false)  then begin 
-                  Destination.set (Game_state.get_level ()) (Destination.get e2);
-                  Before.set e1 true
+                if Resting.has_component e2 && ((Before.get (Game_state.get_player ())) == false) then begin 
+                  Destination.set (Game_state.get_level ()) (Destination.get e1);
+                  Before.set e2 true;
                 end
+              end else begin
+                if Background.get e1 && Resting.has_component e2 then begin
+                  Background.set e1 false;
+                  Before.set e2 true;
+                  Stuff.set (Game_state.get_inventory ()) ((Name.get e1)::(Stuff.get (Game_state.get_inventory ())));
+                  if String.equal (Name.get e1) "glider" then Glider.set (Game_state.get_inventory ()) true;
+                  if String.equal (Name.get e1) "shrinker" then Shrinker.set (Game_state.get_inventory ()) true;
+                  if String.equal (Name.get e1) "reactor" then Reactor.set (Game_state.get_inventory ()) true;
+                  if String.equal (Name.get e1) "climber" then Climber.set (Game_state.get_inventory ()) true;
+                end
+              end
+            end else begin
+              if Destination.has_component e2 then begin
+                if Background.has_component e2 then begin
+                  if Before.has_component e2 && Resting.has_component e1 then begin 
+                    Leaving.set (Game_state.get_level ()) true;
+                  end;
+                  if Before.has_component e1 && ((Before.get (Game_state.get_player ())) == false)  then begin 
+                    Destination.set (Game_state.get_level ()) (Destination.get e2);
+                    Before.set e1 true;
+                  end
+              end else begin
+                if Background.get e2 && Resting.has_component e1 then begin
+                  Background.set e2 false;
+                  Before.set e1 true;
+                  Stuff.set (Game_state.get_inventory ()) ((Name.get e2)::(Stuff.get (Game_state.get_inventory ())));
+                  if String.equal (Name.get e2) "glider" then Glider.set (Game_state.get_inventory ()) true;
+                  if String.equal (Name.get e2) "shrinker" then Shrinker.set (Game_state.get_inventory ()) true;
+                  if String.equal (Name.get e2) "reactor" then Reactor.set (Game_state.get_inventory ()) true;
+                  if String.equal (Name.get e2) "climber" then Climber.set (Game_state.get_inventory ()) true;
+                end
+              end
             end else begin
                         (* [3] le plus petit des vecteurs a b c d *)
                         let a = Vector.{ x = s_pos.x; y = 0.0} in
@@ -68,8 +92,8 @@ let update _dt el =
                         if BounceLeft.has_component e2 then BounceLeft.set e2 (n == a && n != c);
                         if BounceRight.has_component e1 then BounceRight.set e1 (n == b && n != c);
                         if BounceRight.has_component e2 then BounceRight.set e2 (n == b && n != c);
-                        if Dash.has_component e1 then Dash.set e1 (n == c);
-                        if Dash.has_component e2 then Dash.set e2 (n == c);
+                        if Dash.has_component e1 && (n == c) then Dash.set e1 true;
+                        if Dash.has_component e2 && (n == c) then Dash.set e2 true;
 
                          (* [10] appel des resolveurs *)
                          if CollisionResolver.has_component e1 then (CollisionResolver.get e1) e1 e2;

@@ -9,8 +9,13 @@ let create name =
   Box.set e {width = (int_of_string (List.nth size 0)) ; height = (int_of_string (List.nth size 1)) };
   Leaving.set e false;
   Destination.set e { name = "level1" ; x = 100.0 ; y = 450.0 };
-  Name.set e name;
   e
+  
+let set name =
+  let size = String.split_on_char ',' (input_line (open_in ("/static/resources/"^name^"/size.txt"))) in
+  Box.set (Game_state.get_level ()) {width = (int_of_string (List.nth size 0)) ; height = (int_of_string (List.nth size 1)) };
+  Leaving.set (Game_state.get_level ()) false;
+  ()
   
 let load_walls name = 
     let ic = open_in ("/static/resources/"^name^"/walls.txt") in
@@ -74,6 +79,22 @@ let load_doors name =
             done 
           with End_of_file -> () in
           ()
+          
+let load_items name = 
+    let ic = open_in ("/static/resources/"^name^"/items.txt") in
+    let () =
+        try
+          let stuff = Stuff.get (Game_state.get_inventory ()) in
+          while true do
+            let line = input_line ic in
+            match String.split_on_char ',' line with
+              |[ sn; sx; sy; sw; sh ] -> if (List.find_opt (fun e -> String.equal e sn) stuff) == None then
+                                                  ignore (Item.create sn (float_of_string sx) (float_of_string sy) 
+                                                                     (int_of_string sw) (int_of_string sh));
+              | _ ->  ()
+            done 
+          with End_of_file -> () in
+          ()
 
 let load_level name = 
   load_walls name;
@@ -116,10 +137,11 @@ let change_level ()=
   if Leaving.get (Game_state.get_level ()) then begin
     let d = Destination.get (Game_state.get_level ()) in
     clear ();
-    let level = create d.name in
+    set d.name;
     load_level d.name;
     let player = Player.create "player" d.x d.y in
     load_background d.name;
-    Game_state.init player level;
+    Game_state.init player (Game_state.get_level ()) (Game_state.get_inventory ());
+    load_items d.name;
     true
   end else false

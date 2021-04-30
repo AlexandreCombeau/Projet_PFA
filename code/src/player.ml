@@ -57,77 +57,81 @@ let move fdir =
     SumForces.set e new_f
 
 let do_move () =
-  let r = Resting.get (Game_state.get_player ()) in
+  let player = (Game_state.get_player ()) in 
+  let r = Resting.get player in
+  let b = Before.get player in
+  if b then Item.clear();
   if action.interact && r then begin
-    let b = Before.get (Game_state.get_player ()) in
     if b then begin
       Leaving.set (Game_state.get_level ()) true;
     end
   end else begin
-    let d = Dash.get (Game_state.get_player ()) in
-    let br = BounceRight.get (Game_state.get_player ()) in
-    let bl = BounceLeft.get (Game_state.get_player ()) in
-    let cr = Croushed.get (Game_state.get_player ()) in
+    let d = Dash.get player in
+    let br = BounceRight.get player in
+    let bl = BounceLeft.get player in
+    let cr = Croushed.get player in
+    
+    let inventory = (Game_state.get_inventory ()) in
+    let gl = Glider.get inventory in
+    let sh = Shrinker.get inventory in
+    let re = Reactor.get inventory in
+    let cl = Climber.get inventory in 
     (* Si on teste r pour les mouvement horizontaux, on ne peut
        pas diriger le personnage en l'air : difficile de le contrôler
     *)
-    if action.crouch && (cr == false) then begin
-      Before.set (Game_state.get_player ()) false;
-      let taille = Box.get (Game_state.get_player ()) in
-      let pos = Position.get (Game_state.get_player ()) in
-      Position.set (Game_state.get_player ()) {x = pos.x; y = pos.y +. (float_of_int taille.height)/. 2.};
-      Croushed.set (Game_state.get_player ()) true;
-      Box.set (Game_state.get_player ()) {width = taille.width; height = taille.height/2}
+    Before.set player false;
+    if action.crouch && (cr == false) && sh then begin
+      let taille = Box.get player in
+      let pos = Position.get player in
+      Position.set player {x = pos.x; y = pos.y +. (float_of_int taille.height)/. 2.};
+      Croushed.set player true;
+      Box.set player {width = taille.width; height = taille.height/2}
     end;
-    if action.glide && (cr == false) then begin
-      Before.set (Game_state.get_player ()) false;
-      let v = Velocity.get (Game_state.get_player ()) in
-      Velocity.set (Game_state.get_player ()) { x = v.x ; y = ((v.y)/.(1.25)) }
+    if action.glide && (cr == false) && gl then begin
+      let v = Velocity.get player in
+      Velocity.set player { x = v.x ; y = ((v.y)/.(1.25)) }
     end;
     if action.move_left then begin
-      Before.set (Game_state.get_player ()) false;
-      if (r == false) && br && action.bounce && (cr == false) then begin
-        Velocity.set (Game_state.get_player ()) Vector.zero;
+      if (r == false) && br && action.bounce && (cr == false) && cl then begin
+        Velocity.set player Vector.zero;
         move { x = 0.70 ; y = -0.25 };
-        Dash.set (Game_state.get_player ()) true;
-        BounceRight.set (Game_state.get_player ()) false
+        Dash.set player true;
+        BounceRight.set player false
       end else begin
-        if action.dash && d && (action.move_right == false) && (cr == false) then begin
-          Velocity.set (Game_state.get_player ()) Vector.zero;
+        if action.dash && d && (action.move_right == false) && (cr == false) && re then begin
+          Velocity.set player Vector.zero;
           move { x = -0.80 ; y = -0.05 };
-          Resting.set (Game_state.get_player ()) false;
-          Dash.set (Game_state.get_player ()) false
+          Resting.set player false;
+          Dash.set player false
         end else begin 
-          Resting.set (Game_state.get_player ()) false;
-          BounceRight.set (Game_state.get_player ()) false;
+          Resting.set player false;
+          BounceRight.set player false;
           move { x = -0.05 ; y = 0.0 }
         end
       end
     end;
     if action.move_right then begin
-      Before.set (Game_state.get_player ()) false;
-      if (r == false) && bl && action.bounce && (cr == false) then begin
-        Velocity.set (Game_state.get_player ()) Vector.zero;
+      if (r == false) && bl && action.bounce && (cr == false) && cl then begin
+        Velocity.set player Vector.zero;
         move { x = -0.70 ; y = -0.25 };
-        Dash.set (Game_state.get_player ()) true;
-        BounceLeft.set (Game_state.get_player ()) false
+        Dash.set player true;
+        BounceLeft.set player false
       end else begin
-        if action.dash && d && (action.move_left == false) && (cr == false) then begin
-          Velocity.set (Game_state.get_player ()) Vector.zero;
+        if action.dash && d && (action.move_left == false) && (cr == false) && re then begin
+          Velocity.set player Vector.zero;
           move { x = 0.80 ; y = -0.05 };
-          Resting.set (Game_state.get_player ()) false;
-          Dash.set (Game_state.get_player ()) false
+          Resting.set player false;
+          Dash.set player false
         end else begin
-          Resting.set (Game_state.get_player ()) false;
-          BounceLeft.set (Game_state.get_player ()) false;
+          Resting.set player false;
+          BounceLeft.set player false;
           move { x = 0.05 ; y = 0.0 }
         end
       end
     end;
     if action.jump && r then begin
-      Before.set (Game_state.get_player ()) false;
       move { x = 0.0; y = -0.35 };
-      Resting.set (Game_state.get_player ()) false
+      Resting.set player false
     end
   end
     

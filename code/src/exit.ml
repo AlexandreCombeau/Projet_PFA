@@ -9,9 +9,8 @@ let create name x y w h room dx dy =
   Velocity.set e Vector.zero;
   Box.set e {width = w; height=h };
   Name.set e name;
-  Background.set e "exit";
+  Background.set e true;
   Before.set e true;
-  Surface.set e (Color (Gfx.color 0 128 128 100));
   Destination.set e { name = room ; x = dx ; y = dy };
   (* Systems *)
   Collision_S.register e;
