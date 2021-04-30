@@ -18,7 +18,6 @@ let init p lvl =
                          level = lvl;
                        }
 
-
-  let get_player () = (get_state ()) . player
+let get_player () = (get_state ()) . player
   
-  let get_level () = (get_state ()) . level
+let get_level () = (get_state ()) . level

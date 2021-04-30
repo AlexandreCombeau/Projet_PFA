@@ -7,11 +7,11 @@ let create name x y w h room dx dy =
   (* components *)
   Position.set e { x = x; y = y};
   Velocity.set e Vector.zero;
-  Mass.set e 1.0;
   Box.set e {width = w; height=h };
   Name.set e name;
-  Surface.set e Texture.yellow;
-  Destination.set e { roomID = room ; x = dx ; y = dy };
+  Background.set e "door";
+  Surface.set e (Color (Gfx.color 128 128 128 100));
+  Destination.set e { name = room ; x = dx ; y = dy };
   (* Systems *)
   Collision_S.register e;
   Draw_S.register e;

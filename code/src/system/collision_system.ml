@@ -25,6 +25,18 @@ let update _dt el =
         if Rect.has_origin s_pos s_rect &&
           not (Vector.is_zero v1 && Vector.is_zero v2)
           then begin
+            if Background.has_component e1 then begin
+              if Before.has_component e2 && ((Before.get (Game_state.get_player ())) == false) then begin 
+              Destination.set (Game_state.get_level ()) (Destination.get e1);
+              Before.set e2 true
+              end
+            end else begin
+            if Background.has_component e2 then begin
+              if Before.has_component e1 && ((Before.get (Game_state.get_player ())) == false)  then begin 
+                Destination.set (Game_state.get_level ()) (Destination.get e2);
+                Before.set e1 true
+              end
+            end else begin
                         (* [3] le plus petit des vecteurs a b c d *)
                         let a = Vector.{ x = s_pos.x; y = 0.0} in
                         let b = Vector.{ x = float s_rect.width +. s_pos.x; y = 0.0 } in
@@ -88,6 +100,8 @@ let update _dt el =
                         (* [9] mise à jour des vitesses *)
                         Velocity.set e1 new_v1;
                         Velocity.set e2 new_v2;
-                  end
+            end
+          end
+        end
       end
       ) el) el

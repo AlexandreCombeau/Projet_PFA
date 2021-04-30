@@ -11,9 +11,10 @@ let chain_functions f_list =
                  end
 
 let init_game _dt =
-  let level = Level.create "level1" in
-  Level.load_level "level1";
-  let player = Player.create "player" 100.0 300.0 in
+  let level = Level.create "level2" in
+  Level.load_walls "level2";
+  let player = Player.create "player" 100.0 5850.0 in
+  Level.load_doors "level2";
   Game_state.init player level;
   Input_handler.register_command (KeyDown "w") (Player.jump);
   Input_handler.register_command (KeyUp "w") (Player.stop_jump);
@@ -25,7 +26,9 @@ let init_game _dt =
   Input_handler.register_command (KeyUp "s") (Player.stop_glide);
   Input_handler.register_command (KeyDown "ArrowUp") (Player.interact);
   Input_handler.register_command (KeyUp "ArrowUp") (Player.stop_interact);
-
+  
+  Input_handler.register_command (KeyDown "ArrowDown") (Player.crouch);
+  Input_handler.register_command (KeyUp "ArrowDown") (Player.stop_crouch);
   Input_handler.register_command (KeyDown "ArrowLeft") (Player.run_left);
   Input_handler.register_command (KeyUp "ArrowLeft") (Player.stop_run_left);
   Input_handler.register_command (KeyDown "ArrowRight") (Player.run_right);
@@ -35,6 +38,8 @@ let init_game _dt =
 
 let play_game dt =
   Player.do_move ();
+  let lvl = Level.change_level () in
+  if lvl then System.init_all ();
   System.update_all dt;
   true
 

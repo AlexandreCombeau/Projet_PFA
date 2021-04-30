@@ -10,7 +10,7 @@ let create name x y w h room dx dy =
   Mass.set e infinity;
   Box.set e {width = w; height=h };
   Name.set e name;
-  Destination.set e { roomID = room ; x = dx ; y = dy };
+  Destination.set e { name = room ; x = dx ; y = dy };
   (* Systems *)
   Collision_S.register e;
   e
