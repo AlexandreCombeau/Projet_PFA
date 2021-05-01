@@ -25,11 +25,12 @@ let load_walls name =
         while true do
             let line = input_line ic in
             match String.split_on_char ',' line with
-            | [ sx; sy; sw; sh ] -> ignore (Wall.create ("wall_" ^ string_of_int !count)
+            | [ sx; sy; sw; sh; img ] -> ignore (Wall.create ("wall_" ^ string_of_int !count)
                                                         (float_of_string sx)
                                                         (float_of_string sy)
                                                         (int_of_string sw)
-                                                        (int_of_string sh));
+                                                        (int_of_string sh)
+                                                        ("resources/images/world/"^img^".png"));
                                                         count := !count + 1;
             | _ -> ()
         done;
@@ -138,6 +139,20 @@ let load_items name =
             done 
           with End_of_file -> () in
           ()
+          
+let load_view name =
+  let ic = open_in ("/static/resources/"^name^"/view.txt") in
+    let () =
+        try
+          let box = Box.get (Game_state.get_level ()) in
+          while true do
+            let line = input_line ic in
+            match String.split_on_char ',' line with
+              |[ s ] -> ignore (View.create ("view") box.width box.height);
+              | _ ->  ()
+            done 
+          with End_of_file -> () in
+          ()
 
 let load_level name = 
   load_walls name;
@@ -152,6 +167,7 @@ let load_background name =
 let load_other name =
   load_traps name;
   load_items name;
+  load_view name;
   ()
 
 let clear () = 
@@ -194,7 +210,7 @@ let change_level ()=
       clear ();
       set d.name;
       load_level d.name;
-      let player = Player.create "player" d.x d.y in
+      let player = Player.create "player" d.x d.y (Loading_image.get_image "resources/images/perso/anim_course_d.png") in
       load_background d.name;
       Game_state.init player (Game_state.get_level ()) (Game_state.get_inventory ());
       load_other d.name;
