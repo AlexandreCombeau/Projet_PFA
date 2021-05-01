@@ -20,6 +20,7 @@ module Background = Component.Make(struct type t = bool let name = "existOrNot" 
 module SumForces = Component.Make (struct type t = Vector.t let name = "forces" end)
 
 module Destination = Component.Make (struct include RoomInfo let name = "destination" end)
+module Hurt = Component.Make (struct type t = int let name = "hurtValue" end)
 
 module HitPoints = Component.Make (struct type t = int let name = "healthBar" end)
 module Stuff = Component.Make (struct type t = string list let name = "belongings" end)

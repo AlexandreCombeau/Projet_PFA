@@ -35,6 +35,26 @@ let load_walls name =
         done;
       with End_of_file -> () in 
       ()
+      
+let load_objects name = 
+    let ic = open_in ("/static/resources/"^name^"/objects.txt") in
+    let () =
+      try
+        let count = ref 0 in
+        while true do
+            let line = input_line ic in
+            match String.split_on_char ',' line with
+            | [ sx; sy; sw; sh; sm ] -> ignore (Object.create ("object_" ^ string_of_int !count)
+                                                        (float_of_string sx)
+                                                        (float_of_string sy)
+                                                        (int_of_string sw)
+                                                        (int_of_string sh)
+                                                        (float_of_string sm));
+                                                        count := !count + 1;
+            | _ -> ()
+        done;
+      with End_of_file -> () in 
+      ()
     
 let load_exits name = 
     let ic = open_in ("/static/resources/"^name^"/exits.txt") in
@@ -57,6 +77,29 @@ let load_exits name =
         done;
       with End_of_file -> () in 
       ()    
+
+let load_traps name = 
+    let ic = open_in ("/static/resources/"^name^"/traps.txt") in
+    let () =
+        try
+          let count = ref 0 in
+          let pos = (Position.get (Game_state.get_player ())) in
+          while true do
+            let line = input_line ic in
+            match String.split_on_char ',' line with
+              |[ sx; sy; sw; sh ] -> ignore (Trap.create ("trap_" ^ string_of_int !count)
+                                                            (float_of_string sx)
+                                                            (float_of_string sy)
+                                                            (int_of_string sw)
+                                                            (int_of_string sh)
+                                                            name
+                                                            pos.x
+                                                            pos.y);
+                                                            count := !count + 1;
+              | _ ->  ()
+            done 
+          with End_of_file -> () in
+          ()
 
 let load_doors name = 
     let ic = open_in ("/static/resources/"^name^"/doors.txt") in
@@ -98,11 +141,17 @@ let load_items name =
 
 let load_level name = 
   load_walls name;
+  load_objects name;
   ()
 
 let load_background name =
   load_exits name;
   load_doors name;
+  ()
+  
+let load_other name =
+  load_traps name;
+  load_items name;
   ()
 
 let clear () = 
@@ -124,7 +173,8 @@ let clear () =
     Before.delete (fst e);
     Background.delete (fst e);
     SumForces.delete (fst e);
-    Destination.delete (fst e);  
+    Destination.delete (fst e);
+    Hurt.delete (fst e);
   
     Collision_S.unregister (fst e);
     Control_S.unregister (fst e);
@@ -132,16 +182,21 @@ let clear () =
     Draw_S.unregister (fst e);
     Force_S.unregister (fst e);) elem_list;
     ()
-    
-let change_level ()=
-  if Leaving.get (Game_state.get_level ()) then begin
-    let d = Destination.get (Game_state.get_level ()) in
-    clear ();
-    set d.name;
-    load_level d.name;
-    let player = Player.create "player" d.x d.y in
-    load_background d.name;
-    Game_state.init player (Game_state.get_level ()) (Game_state.get_inventory ());
-    load_items d.name;
+
+let check_state () = 
+  if (HitPoints.get (Game_state.get_inventory ())) < 1 then begin 
+    clear (); 
     true
   end else false
+let change_level ()=
+    if Leaving.get (Game_state.get_level ()) then begin
+      let d = Destination.get (Game_state.get_level ()) in
+      clear ();
+      set d.name;
+      load_level d.name;
+      let player = Player.create "player" d.x d.y in
+      load_background d.name;
+      Game_state.init player (Game_state.get_level ()) (Game_state.get_inventory ());
+      load_other d.name;
+      true
+    end else check_state ()

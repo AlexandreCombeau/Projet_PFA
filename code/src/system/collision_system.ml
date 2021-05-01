@@ -26,47 +26,57 @@ let update _dt el =
           not (Vector.is_zero v1 && Vector.is_zero v2)
           then begin
             if Background.has_component e1 then begin
-              if Destination.has_component e1 then begin
-                if Before.has_component e1 && Resting.has_component e2 then begin 
-                  Leaving.set (Game_state.get_level ()) true;
+              if Resting.has_component e2 then begin
+                if Hurt.has_component e1 then begin
+                  HitPoints.set (Game_state.get_inventory ()) ((HitPoints.get (Game_state.get_inventory ())) - Hurt.get e1);
                 end;
-                if Resting.has_component e2 && ((Before.get (Game_state.get_player ())) == false) then begin 
-                  Destination.set (Game_state.get_level ()) (Destination.get e1);
-                  Before.set e2 true;
-                end
-              end else begin
-                if Background.get e1 && Resting.has_component e2 then begin
-                  Background.set e1 false;
-                  Before.set e2 true;
-                  Stuff.set (Game_state.get_inventory ()) ((Name.get e1)::(Stuff.get (Game_state.get_inventory ())));
-                  if String.equal (Name.get e1) "glider" then Glider.set (Game_state.get_inventory ()) true;
-                  if String.equal (Name.get e1) "shrinker" then Shrinker.set (Game_state.get_inventory ()) true;
-                  if String.equal (Name.get e1) "reactor" then Reactor.set (Game_state.get_inventory ()) true;
-                  if String.equal (Name.get e1) "climber" then Climber.set (Game_state.get_inventory ()) true;
-                end
-              end
-            end else begin
-              if Destination.has_component e2 then begin
-                if Background.has_component e2 then begin
-                  if Before.has_component e2 && Resting.has_component e1 then begin 
+                if Destination.has_component e1 then begin
+                  if Before.has_component e1 then begin 
                     Leaving.set (Game_state.get_level ()) true;
                   end;
-                  if Before.has_component e1 && ((Before.get (Game_state.get_player ())) == false)  then begin 
-                    Destination.set (Game_state.get_level ()) (Destination.get e2);
-                    Before.set e1 true;
+                  if ((Before.get (Game_state.get_player ())) == false) then begin 
+                    Destination.set (Game_state.get_level ()) (Destination.get e1);
+                    Before.set e2 true;
                   end
-              end else begin
-                if Background.get e2 && Resting.has_component e1 then begin
-                  Background.set e2 false;
-                  Before.set e1 true;
-                  Stuff.set (Game_state.get_inventory ()) ((Name.get e2)::(Stuff.get (Game_state.get_inventory ())));
-                  if String.equal (Name.get e2) "glider" then Glider.set (Game_state.get_inventory ()) true;
-                  if String.equal (Name.get e2) "shrinker" then Shrinker.set (Game_state.get_inventory ()) true;
-                  if String.equal (Name.get e2) "reactor" then Reactor.set (Game_state.get_inventory ()) true;
-                  if String.equal (Name.get e2) "climber" then Climber.set (Game_state.get_inventory ()) true;
+                end else begin
+                  if Background.get e1 then begin
+                    Background.set e1 false;
+                    Before.set e2 true;
+                    Stuff.set (Game_state.get_inventory ()) ((Name.get e1)::(Stuff.get (Game_state.get_inventory ())));
+                    if String.equal (Name.get e1) "glider" then Glider.set (Game_state.get_inventory ()) true;
+                    if String.equal (Name.get e1) "shrinker" then Shrinker.set (Game_state.get_inventory ()) true;
+                    if String.equal (Name.get e1) "reactor" then Reactor.set (Game_state.get_inventory ()) true;
+                    if String.equal (Name.get e1) "climber" then Climber.set (Game_state.get_inventory ()) true;
+                  end
                 end
               end
             end else begin
+              if Background.has_component e2 then begin
+                if Resting.has_component e1 then begin
+                  if Hurt.has_component e2 then begin
+                    HitPoints.set (Game_state.get_inventory ()) ((HitPoints.get (Game_state.get_inventory ())) - Hurt.get e2);
+                  end;
+                  if Destination.has_component e2 then begin
+                    if Before.has_component e2 then begin 
+                      Leaving.set (Game_state.get_level ()) true;
+                    end;
+                    if ((Before.get (Game_state.get_player ())) == false) then begin 
+                      Destination.set (Game_state.get_level ()) (Destination.get e2);
+                      Before.set e1 true; 
+                    end
+                  end else begin
+                    if Background.get e2 then begin
+                      Background.set e2 false;
+                      Before.set e1 true;
+                      Stuff.set (Game_state.get_inventory ()) ((Name.get e2)::(Stuff.get (Game_state.get_inventory ())));
+                      if String.equal (Name.get e1) "glider" then Glider.set (Game_state.get_inventory ()) true;
+                      if String.equal (Name.get e1) "shrinker" then Shrinker.set (Game_state.get_inventory ()) true;
+                      if String.equal (Name.get e1) "reactor" then Reactor.set (Game_state.get_inventory ()) true;
+                      if String.equal (Name.get e1) "climber" then Climber.set (Game_state.get_inventory ()) true;
+                    end
+                  end
+                end
+              end else begin
                         (* [3] le plus petit des vecteurs a b c d *)
                         let a = Vector.{ x = s_pos.x; y = 0.0} in
                         let b = Vector.{ x = float s_rect.width +. s_pos.x; y = 0.0 } in
@@ -85,7 +95,7 @@ let update _dt el =
                         let delta_pos1 = Vector.mult n1 n in
                         let delta_pos2 = Vector.mult (Float.neg n2) n in
                         Position.set e1 (Vector.add pos1 delta_pos1);
-                        Position.set e2 (Vector.add pos2 delta_pos2);
+                        Position.set e2 (Vector.add pos2 delta_pos2); 
                         if Resting.has_component e1 then Resting.set e1 (n == c);
                         if Resting.has_component e2 then Resting.set e2 (n == c);
                         if BounceLeft.has_component e1 then BounceLeft.set e1 (n == a && n != c);

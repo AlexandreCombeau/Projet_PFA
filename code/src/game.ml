@@ -15,9 +15,9 @@ let init_game _dt =
   Level.load_level "level2";
   let player = Player.create "player" 100.0 5850.0 in
   Level.load_background "level2";
-  let inventory = Inventory.create 15 [] true true false true in
+  let inventory = Inventory.create 3 [] true true false true in
   Game_state.init player level inventory;
-  Level.load_items "level2";
+  Level.load_other "level2";
   Input_handler.register_command (KeyDown "w") (Player.jump);
   Input_handler.register_command (KeyUp "w") (Player.stop_jump);
   Input_handler.register_command (KeyDown "w") (Player.bounce);
