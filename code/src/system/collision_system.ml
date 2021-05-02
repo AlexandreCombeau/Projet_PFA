@@ -27,9 +27,6 @@ let update _dt el =
           then begin
             if Background.has_component e1 then begin
               if Resting.has_component e2 then begin
-                if Hurt.has_component e1 then begin
-                  HitPoints.set (Game_state.get_inventory ()) ((HitPoints.get (Game_state.get_inventory ())) - Hurt.get e1);
-                end;
                 if Destination.has_component e1 then begin
                   if Before.has_component e1 then begin 
                     Leaving.set (Game_state.get_level ()) true;
@@ -53,9 +50,6 @@ let update _dt el =
             end else begin
               if Background.has_component e2 then begin
                 if Resting.has_component e1 then begin
-                  if Hurt.has_component e2 then begin
-                    HitPoints.set (Game_state.get_inventory ()) ((HitPoints.get (Game_state.get_inventory ())) - Hurt.get e2);
-                  end;
                   if Destination.has_component e2 then begin
                     if Before.has_component e2 then begin 
                       Leaving.set (Game_state.get_level ()) true;

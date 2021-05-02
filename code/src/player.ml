@@ -11,12 +11,7 @@ type action = {
                 mutable glide : bool;
                 mutable crouch : bool;
                 mutable interact : bool;
-              }
-                
-type direction = {
-  mutable dir : string;
-  mutable flag : bool;
-}         
+              }        
          
 let action = { 
                move_left = false; 
@@ -28,21 +23,15 @@ let action = {
                crouch = false;
                interact = false;
              }
-             
-let direction = {
-  dir = "d";
-  flag = true;
-}
 
-
-let create name x y img =
+let create name x y =
   let e = Entity.create () in
   (* components *)
   Position.set e {x = x; y = y };
   Velocity.set e { x = 0.0; y = 0.0 };
   Mass.set e 10.0;
   Box.set e {width = 32 ; height = 64};
-  Surface.set e (Texture.create_animation img 16 4 18 31 32 64);
+  Surface.set e Texture.blue;
   Name.set e name;
   Resting.set e false;
   BounceRight.set e false;
@@ -60,18 +49,6 @@ let create name x y img =
   Force_S.register e;
   e
 
-let anim d = 
-  if direction.flag then begin
-    let new_taille = Box.get (Game_state.get_player ()) in
-    if action.crouch then begin 
-      let path = "resources/images/perso/anim_crouch_"^d^".png" in
-      Surface.set (Game_state.get_player ()) (Texture.create_animation (Loading_image.get_image path ) 16 4 16 16 new_taille.width new_taille.height);
-    end else begin 
-      let path = "resources/images/perso/anim_course_"^d^".png" in
-      Surface.set (Game_state.get_player ()) (Texture.create_animation (Loading_image.get_image path) 16 4 18 31 new_taille.width new_taille.height);
-    end 
-end
-
 let move fdir =
   let e = Game_state.get_player () in
     let old_f = SumForces.get e in
@@ -82,6 +59,14 @@ let do_move () =
   let player = (Game_state.get_player ()) in 
   let r = Resting.get player in
   let b = Before.get player in
+  let pos = Position.get player in
+  let box = Box.get (Game_state.get_level ()) in
+  if (pos.x < 0.0) 
+  || (pos.x > (float_of_int box.width)) 
+  || (pos.y < 0.0)
+  || (pos.y > (float_of_int box.height)) then begin
+    Leaving.set (Game_state.get_level ()) true;
+  end;
   if b then Item.clear();
   if action.interact && r then begin
     if b then begin
@@ -108,23 +93,15 @@ let do_move () =
       Position.set player {x = pos.x; y = pos.y +. (float_of_int taille.height)/. 2.};
       Croushed.set player true;
       Box.set player {width = taille.width; height = taille.height/2};
-      let new_taille = Box.get (Game_state.get_player ()) in
-      let path = "resources/images/perso/anim_crouch_"^direction.dir^".png" in
-      Surface.set (Game_state.get_player ()) (Texture.create_animation (Loading_image.get_image path) 16 4 16 16 new_taille.width new_taille.height)
     end;
     if action.glide && (cr == false) && gl then begin
-      let new_taille = Box.get (Game_state.get_player ()) in
-      let path = "resources/images/perso/planner_"^direction.dir^".png" in
-      Surface.set (Game_state.get_player ()) (Texture.create_image (Loading_image.get_image path ) new_taille.width new_taille.height);
       let v = Velocity.get player in
       Velocity.set player { x = v.x ; y = ((v.y)/.(1.25)) }
     end;
     if action.move_left then begin
-      anim direction.dir;
-      direction.flag <- false;
       if (r == false) && br && action.bounce && (cr == false) && cl then begin
         Velocity.set player Vector.zero;
-        move { x = 0.70 ; y = -0.25 };
+        move { x = 0.55 ; y = -0.25 };
         Dash.set player true;
         BounceRight.set player false
       end else begin
@@ -142,11 +119,9 @@ let do_move () =
       end
     end;
     if action.move_right then begin
-      anim direction.dir;
-      direction.flag <- false;
       if (r == false) && bl && action.bounce && (cr == false) && cl then begin
         Velocity.set player Vector.zero;
-        move { x = -0.70 ; y = -0.25 };
+        move { x = -0.55 ; y = -0.25 };
         Dash.set player true;
         BounceLeft.set player false
       end else begin
@@ -164,7 +139,7 @@ let do_move () =
       end
     end;
     if action.jump && r then begin
-      move { x = 0.0; y = -0.35 };
+      move { x = 0.0; y = -0.25 };
       BounceLeft.set player false;
       BounceRight.set player false;
       Resting.set player false
@@ -172,14 +147,8 @@ let do_move () =
   end
     
 let jump () = action.jump <- true
-let run_left () = begin 
-  action.move_left <- true;
-  direction.dir <- "g"
-end
-let run_right () = begin 
-  action.move_right <- true;
-  direction.dir <- "d"
-end
+let run_left () = action.move_left <- true
+let run_right () = action.move_right <- true
 let dash () = action.dash <- true
 let bounce () = action.bounce <- true
 let glide () = action.glide <- true
@@ -187,24 +156,11 @@ let crouch () = action.crouch <- true
 let interact () = action.interact <- true
 
 let stop_jump () = action.jump <-  false
-let stop_run_left () = begin
-  action.move_left <- false;
-  direction.dir <- "g";
-  direction.flag <- true
-end
-let stop_run_right () = begin 
-  action.move_right <- false;
-  direction.dir <- "d";
-  direction.flag <- true
-end
+let stop_run_left () = action.move_left <- false
+let stop_run_right () = action.move_right <- false
 let stop_dash () = action.dash <- false
 let stop_bounce () = action.bounce <- false
-let stop_glide () = begin 
-  action.glide <- false;
-  let new_taille = Box.get (Game_state.get_player ()) in
-  let path = "resources/images/perso/anim_course_"^direction.dir^".png" in
-  Surface.set (Game_state.get_player ()) (Texture.create_animation (Loading_image.get_image path) 16 4 18 31 new_taille.width new_taille.height);
-end
+let stop_glide () = action.glide <- false
 let stop_crouch () = 
   begin 
     action.crouch <- false;
@@ -214,9 +170,6 @@ let stop_crouch () =
       Position.set (Game_state.get_player ()) {x = pos.x; y = pos.y -. (float_of_int taille.height)};
       Croushed.set (Game_state.get_player ()) false;
       Box.set (Game_state.get_player ()) {width = taille.width; height = taille.height*2};
-      let new_taille = Box.get (Game_state.get_player ()) in
-      let path = "resources/images/perso/anim_course_"^direction.dir^".png" in
-      Surface.set (Game_state.get_player ()) (Texture.create_animation (Loading_image.get_image path) 16 4 18 31 new_taille.width new_taille.height);
     end
   end
 let stop_interact () = action.interact <- false

@@ -11,8 +11,7 @@ let create name x y w h room dx dy =
   Name.set e name;
   Background.set e true;
   Before.set e true;
-  Hurt.set e 1;
-  Surface.set e (Color (Gfx.color 0 250 0 100));
+  Surface.set e Texture.green;
   Destination.set e { name = room ; x = dx ; y = dy };
   (* Systems *)
   Collision_S.register e;

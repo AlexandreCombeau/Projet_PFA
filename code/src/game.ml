@@ -1,18 +1,5 @@
 open Ecs
 
-let () = Loading_image.load_image "resources/images/perso/anim_course_g.png"
-let () = Loading_image.load_image "resources/images/perso/anim_course_d.png"
-let () = Loading_image.load_image "resources/images/perso/anim_crouch_g.png"
-let () = Loading_image.load_image "resources/images/perso/anim_crouch_d.png"
-let () = Loading_image.load_image "resources/images/perso/planner_g.png"
-let () = Loading_image.load_image "resources/images/perso/planner_d.png"
-
-let () = Loading_image.load_image "resources/images/world/large_floor_3.png"
-let () = Loading_image.load_image "resources/images/world/large_wall_3.png"
-let () = Loading_image.load_image "resources/images/world/wall_2.png"
-let () = Loading_image.load_image "resources/images/world/wall_1.png"
-let () = Loading_image.load_image "resources/images/world/background_2.png"
-
 let chain_functions f_list =
   let funs = ref f_list in
   fun dt -> match !funs with
@@ -27,13 +14,13 @@ let chain_functions f_list =
 
  
 let init_game _dt =
-  Level.load_level "level1";
-  let player = Player.create "player" 100.0 450.0 (Loading_image.get_image "resources/images/perso/anim_course_d.png") in
-  Level.load_background "level1";
-  let inventory = Inventory.create 3 [] true true false true in
-  let level = Level.create "level1" in
+  Level.load_level "hub";
+  let player = Player.create "player" 84.0 12.0 in  
+  Level.load_background "hub";
+  let inventory = Inventory.create [] false false false false in
+  let level = Level.create "hub" in
   Game_state.init player level inventory;
-  Level.load_other "level1";
+  Level.load_other "hub"; 
   Input_handler.register_command (KeyDown "w") (Player.jump);
   Input_handler.register_command (KeyUp "w") (Player.stop_jump);
   Input_handler.register_command (KeyDown "w") (Player.bounce);
@@ -54,16 +41,26 @@ let init_game _dt =
   System.init_all ();
   false
 
-let cpt = ref 0.0
-
 let play_game dt =
-  if (dt >= !cpt) then begin
-    Player.do_move ();
+  Player.do_move ();
+  let check = Level.check_state () in
+  if check then begin 
+    Level.load_view "end";
+    Inventory.clear ();
+    Level.load_level "end";
+    let player = Player.create "player" 2.0 1.0 in
+    Level.load_background "end"; 
+    let inventory = Inventory.create [] false false false false in
+    Level.set "end";
+    Game_state.init player (Game_state.get_level ()) inventory;
+    System.init_all ();
+  end else begin
     let lvl = Level.change_level () in
-    if lvl then System.init_all ();
-    System.update_all dt;
-    cpt := !cpt +. 1000.0/.60.0;
+    if lvl then begin 
+      System.init_all ();
+    end
   end;
+  System.update_all dt;
   true
 
 

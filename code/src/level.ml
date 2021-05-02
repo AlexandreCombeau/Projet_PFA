@@ -29,19 +29,18 @@ let load_walls name =
                                                         (float_of_string sx)
                                                         (float_of_string sy)
                                                         (int_of_string sw)
-                                                        (int_of_string sh)
-                                                        ("resources/images/world/"^img^".png"));
+                                                        (int_of_string sh));
                                                         count := !count + 1;
             | _ -> ()
         done;
       with End_of_file -> () in 
       ()
       
-let load_objects name = 
+let load_objects name =
     let ic = open_in ("/static/resources/"^name^"/objects.txt") in
     let () =
       try
-        let count = ref 0 in
+        let count = ref 0 in 
         while true do
             let line = input_line ic in
             match String.split_on_char ',' line with
@@ -54,7 +53,7 @@ let load_objects name =
                                                         count := !count + 1;
             | _ -> ()
         done;
-      with End_of_file -> () in 
+      with End_of_file -> () in
       ()
     
 let load_exits name = 
@@ -77,18 +76,18 @@ let load_exits name =
             | _ -> ()
         done;
       with End_of_file -> () in 
-      ()    
-
+      ()   
+ 
 let load_traps name = 
     let ic = open_in ("/static/resources/"^name^"/traps.txt") in
     let () =
-        try
+        try 
           let count = ref 0 in
           let pos = (Position.get (Game_state.get_player ())) in
           while true do
             let line = input_line ic in
             match String.split_on_char ',' line with
-              |[ sx; sy; sw; sh ] -> ignore (Trap.create ("trap_" ^ string_of_int !count)
+              |[ sx; sy; sw; sh; s ] -> ignore (Trap.create ("trap_" ^ string_of_int !count)
                                                             (float_of_string sx)
                                                             (float_of_string sy)
                                                             (int_of_string sw)
@@ -148,15 +147,14 @@ let load_view name =
           while true do
             let line = input_line ic in
             match String.split_on_char ',' line with
-              |[ s ] -> ignore (View.create ("view") box.width box.height);
-              | _ ->  ()
+              |[ s ] -> ignore (View.create s box.width box.height);
+              | _ ->  () 
             done 
           with End_of_file -> () in
           ()
 
 let load_level name = 
   load_walls name;
-  load_objects name;
   ()
 
 let load_background name =
@@ -186,11 +184,10 @@ let clear () =
     Dash.delete (fst e);
     Croushed.delete (fst e);
     Leaving.delete (fst e);
-    Before.delete (fst e);
+    Before.delete (fst e); 
     Background.delete (fst e);
-    SumForces.delete (fst e);
+    SumForces.delete (fst e); 
     Destination.delete (fst e);
-    Hurt.delete (fst e);
   
     Collision_S.unregister (fst e);
     Control_S.unregister (fst e);
@@ -199,20 +196,23 @@ let clear () =
     Force_S.unregister (fst e);) elem_list;
     ()
 
-let check_state () = 
-  if (HitPoints.get (Game_state.get_inventory ())) < 1 then begin 
-    clear (); 
-    true
-  end else false
+let check_state () =
+  let stuff = Stuff.get (Game_state.get_inventory ()) in
+  if (List.find_opt (fun e -> String.equal e "treasure") stuff) == None then false
+  else begin
+    clear ();
+    true;
+  end
+  
 let change_level ()=
     if Leaving.get (Game_state.get_level ()) then begin
       let d = Destination.get (Game_state.get_level ()) in
       clear ();
       set d.name;
       load_level d.name;
-      let player = Player.create "player" d.x d.y (Loading_image.get_image "resources/images/perso/anim_course_d.png") in
+      let player = Player.create "player" d.x d.y in
       load_background d.name;
       Game_state.init player (Game_state.get_level ()) (Game_state.get_inventory ());
       load_other d.name;
       true
-    end else check_state ()
+    end else false
